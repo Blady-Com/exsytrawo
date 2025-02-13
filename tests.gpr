@@ -1,0 +1,27 @@
+with "exsytrawo";
+
+project Tests is
+
+   for Languages use ("Ada");
+   for Source_Dirs use ("tests");
+   for Object_Dir use "obj";
+   for Exec_Dir use "bin";
+   for Create_Missing_Dirs use "True";
+
+   for Main use ("stbga.adb", "stbh.adb");
+
+   package Compiler is
+      Common_Options := ("-gnatW8", "-gnatU", "-gnatf");
+      for Switches ("ada") use Common_Options & ("-gnatVaep", "-gnatw.eDH.Y.N", "-fstack-check", "-g", "-Wall");
+   end Compiler;
+
+   package Binder is
+      for Switches ("ada") use ("-E");
+   end Binder;
+
+   package Linker is
+      for Switches ("Ada") use ("-Wl,-no_pie");
+   end Linker;
+
+end Tests;
+
