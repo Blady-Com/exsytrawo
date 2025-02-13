@@ -20,6 +20,7 @@ package body Excep_Sym_Trace_Workaround is
       Text     : Ada.Strings.Unbounded.Unbounded_String;
       Result   : Integer;
       Ok       : Boolean;
+      Ind      : Natural;
 
       Args : GNAT.OS_Lib.Argument_List_Access :=
          GNAT.OS_Lib.Argument_String_To_List
@@ -40,6 +41,18 @@ package body Excep_Sym_Trace_Workaround is
                   Ada.Strings.Unbounded.Text_IO.Get_Line (File) & ASCII.LF);
             end loop;
             Ada.Text_IO.Close (File);
+            Ind := Ada.Strings.Unbounded.Index (Text, "main");
+            if Ind = 0 then
+               Ada.Strings.Unbounded.Append
+                 (Text,
+                  "Location not found (possible missing of linker switch -Wl,-no_pie).");
+            else
+               if Ada.Strings.Unbounded.Index (Text, "+", Ind) > 0 then
+                  Ada.Strings.Unbounded.Append
+                    (Text,
+                     "Source code line not found (possible missing of compiler switch -g).");
+               end if;
+            end if;
             return Ada.Strings.Unbounded.To_String (Text);
          else
             return Ada.Strings.Unbounded.To_String (Address_List);
@@ -57,12 +70,16 @@ package body Excep_Sym_Trace_Workaround is
    is
       Address_List : Ada.Strings.Unbounded.Unbounded_String;
    begin
-      for Ind in Traceback'Range loop
-         Ada.Strings.Unbounded.Append
-           (Address_List,
-            " 0x" & System.Address_Image (Traceback (Ind)));
-      end loop;
-      return Exception_Information_Workaround (Address_List);
+      if Traceback'Length /= 0 then
+         for Ind in Traceback'Range loop
+            Ada.Strings.Unbounded.Append
+              (Address_List,
+               " 0x" & System.Address_Image (Traceback (Ind)));
+         end loop;
+         return Exception_Information_Workaround (Address_List);
+      else
+         return "No traceback (possible missing of binder switch -E to store tracebacks in exception occurrences).";
+      end if;
    end Symbolic_Traceback;
 
    function Symbolic_Traceback

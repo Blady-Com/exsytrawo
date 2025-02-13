@@ -1,4 +1,3 @@
-with Ada.Exceptions;
 with Ada.Exceptions.Traceback;
 
 package Excep_Sym_Trace_Workaround is
