@@ -1,3 +1,14 @@
+-------------------------------------------------------------------------------
+-- NAME (body)                  : excep_sym_trace_workaround.adb
+-- AUTHOR                       : Pascal Pignard
+-- ROLE                         : Exception Symbolic Traceback Workaround for macOS.
+-- NOTES                        : Ada 2022
+--
+-- COPYRIGHT                    : (c) Pascal Pignard 2025
+-- LICENCE                      : CeCILL-C (https://cecill.info)
+-- CONTACT                      : http://blady.chez.com
+-------------------------------------------------------------------------------
+
 with System.Address_Image;
 with Ada.Command_Line;
 with Ada.Text_IO;
