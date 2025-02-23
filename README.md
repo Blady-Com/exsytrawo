@@ -16,8 +16,7 @@ In your own [Alire](https://alire.ada.dev) project, add ***exsytrawo*** dependen
 
 Then you can import the Ada ***exsytrawo*** package in your programs.
 
-Your program must compile with ***-g*** switch, bind with ***-E*** switch
-and link with ***-Wl,-no_pie*** switch.
+Your program must compile with ***-g*** switch and bind with ***-E*** switch.
 
 You can use it like that:
 
@@ -69,10 +68,6 @@ begin
   P2;
 end STBH;
 ```
-
-## Limitation
-
-The library is configured only for ***x86_64*** architecture.
 
 ## Licence
 

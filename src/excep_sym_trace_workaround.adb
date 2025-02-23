@@ -32,9 +32,19 @@ package body Excep_Sym_Trace_Workaround is
       Ok       : Boolean;
       Ind      : Natural;
 
+      function Executable_Load_Address return System.Address;
+      pragma Import
+        (C, Executable_Load_Address,
+         "__gnat_get_executable_load_address");
+      Load_Address : constant System.Address := Executable_Load_Address;
+
       Args : GNAT.OS_Lib.Argument_List_Access :=
         GNAT.OS_Lib.Argument_String_To_List
-          ("-o " & Ada.Command_Line.Command_Name & " -arch x86_64 " &
+          ("-o " &
+           Ada.Command_Line.Command_Name &
+           (if System."/=" (Load_Address, System.Null_Address)
+            then " -l 0x" & System.Address_Image (Load_Address) & " "
+            else "") &
            Ada.Strings.Unbounded.To_String (Address_List));
    begin
       if GNAT.OS_Lib.Is_Executable_File (Exe) then
