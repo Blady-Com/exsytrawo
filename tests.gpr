@@ -19,9 +19,5 @@ project Tests is
       for Switches ("ada") use ("-E");
    end Binder;
 
-   package Linker is
-      for Switches ("Ada") use ("-Wl,-no_pie");
-   end Linker;
-
 end Tests;
 

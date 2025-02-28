@@ -1,7 +1,7 @@
 name = "exsytrawo"
 description = "Exception Symbolic Traceback Workaround for macOS"
-version = "1.1.0"
-tags = ["exception", "symbolic", "trace"]
+version = "1.2.0"
+tags = ["exception", "symbolic", "traceback"]
 
 authors = ["Pascal Pignard"]
 maintainers = ["Pascal Pignard <blady.net@orange.fr>"]
