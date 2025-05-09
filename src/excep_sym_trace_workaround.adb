@@ -73,7 +73,9 @@ package body Excep_Sym_Trace_Workaround is
             end if;
             return Ada.Strings.Unbounded.To_String (Text);
          else
-            return Ada.Strings.Unbounded.To_String (Address_List);
+            return "Load address: " & System.Address_Image (Load_Address) & ASCII.LF & "Exceutable: " &
+              Ada.Command_Line.Command_Name & ASCII.LF & "Atos returns: " & result'image & ASCII.LF &
+              Ada.Strings.Unbounded.To_String (Address_List);
          end if;
       else
          return
@@ -103,7 +105,8 @@ package body Excep_Sym_Trace_Workaround is
      (E : Ada.Exceptions.Exception_Occurrence) return String
    is
    begin
-      return Symbolic_Traceback (Ada.Exceptions.Traceback.Tracebacks (E));
+      return "Error: raised " & Ada.Exceptions.Exception_Name (E) & " : " & Ada.Exceptions.Exception_Message (E) &
+        ASCII.LF & Symbolic_Traceback (Ada.Exceptions.Traceback.Tracebacks (E));
    end Symbolic_Traceback;
 
 end Excep_Sym_Trace_Workaround;
