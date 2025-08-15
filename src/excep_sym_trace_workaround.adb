@@ -15,8 +15,11 @@ with Ada.Text_IO;
 with Ada.Strings.Unbounded;
 with GNAT.OS_Lib;
 with Ada.Strings.Unbounded.Text_IO;
+with GNAT.Traceback.Symbolic;
 
 package body Excep_Sym_Trace_Workaround is
+
+   AtoS_Path : constant String := "/usr/bin/atos";
 
    function Exception_Information_Workaround
      (Address_List : Ada.Strings.Unbounded.Unbounded_String) return String
@@ -34,22 +37,20 @@ package body Excep_Sym_Trace_Workaround is
 
       function Executable_Load_Address return System.Address;
       pragma Import
-        (C, Executable_Load_Address,
-         "__gnat_get_executable_load_address");
+        (C, Executable_Load_Address, "__gnat_get_executable_load_address");
       Load_Address : constant System.Address := Executable_Load_Address;
 
       Args : GNAT.OS_Lib.Argument_List_Access :=
         GNAT.OS_Lib.Argument_String_To_List
-          ("-o " &
-           Ada.Command_Line.Command_Name &
-           (if System."/=" (Load_Address, System.Null_Address)
-            then " -l 0x" & System.Address_Image (Load_Address) & " "
+          ("-o " & Ada.Command_Line.Command_Name &
+           (if System."/=" (Load_Address, System.Null_Address) then
+              " -l 0x" & System.Address_Image (Load_Address) & " "
             else "") &
            Ada.Strings.Unbounded.To_String (Address_List));
    begin
       if GNAT.OS_Lib.Is_Executable_File (Exe) then
          Ada.Text_IO.Create (File, Ada.Text_IO.In_File, Filename);
-         GNAT.OS_Lib.Spawn ("/usr/bin/atos", Args.all, Filename, Ok, Result);
+         GNAT.OS_Lib.Spawn (AtoS_Path, Args.all, Filename, Ok, Result);
          GNAT.OS_Lib.Free (Args);
          if Result = 0 then
             Ada.Text_IO.Reset (File);
@@ -73,8 +74,10 @@ package body Excep_Sym_Trace_Workaround is
             end if;
             return Ada.Strings.Unbounded.To_String (Text);
          else
-            return "Load address: " & System.Address_Image (Load_Address) & ASCII.LF & "Exceutable: " &
-              Ada.Command_Line.Command_Name & ASCII.LF & "Atos returns: " & result'image & ASCII.LF &
+            return
+              "Load address: " & System.Address_Image (Load_Address) &
+              ASCII.LF & "Exceutable: " & Ada.Command_Line.Command_Name &
+              ASCII.LF & "Atos returns: " & Result'Image & ASCII.LF &
               Ada.Strings.Unbounded.To_String (Address_List);
          end if;
       else
@@ -89,15 +92,20 @@ package body Excep_Sym_Trace_Workaround is
    is
       Address_List : Ada.Strings.Unbounded.Unbounded_String;
    begin
-      if Traceback'Length /= 0 then
-         for Ind in Traceback'Range loop
-            Ada.Strings.Unbounded.Append
-              (Address_List, " 0x" & System.Address_Image (Traceback (Ind)));
-         end loop;
-         return Exception_Information_Workaround (Address_List);
+      if GNAT.OS_Lib.Is_Executable_File (AtoS_Path) then
+         if Traceback'Length /= 0 then
+            for Ind in Traceback'Range loop
+               Ada.Strings.Unbounded.Append
+                 (Address_List,
+                  " 0x" & System.Address_Image (Traceback (Ind)));
+            end loop;
+            return Exception_Information_Workaround (Address_List);
+         else
+            return
+              "No traceback (possible missing of binder switch -E to store tracebacks in exception occurrences).";
+         end if;
       else
-         return
-           "No traceback (possible missing of binder switch -E to store tracebacks in exception occurrences).";
+         return GNAT.Traceback.Symbolic.Symbolic_Traceback (Traceback);
       end if;
    end Symbolic_Traceback;
 
@@ -105,8 +113,14 @@ package body Excep_Sym_Trace_Workaround is
      (E : Ada.Exceptions.Exception_Occurrence) return String
    is
    begin
-      return "Error: raised " & Ada.Exceptions.Exception_Name (E) & " : " & Ada.Exceptions.Exception_Message (E) &
-        ASCII.LF & Symbolic_Traceback (Ada.Exceptions.Traceback.Tracebacks (E));
+      if GNAT.OS_Lib.Is_Executable_File (AtoS_Path) then
+         return
+           "Error: raised " & Ada.Exceptions.Exception_Name (E) & " : " &
+           Ada.Exceptions.Exception_Message (E) & ASCII.LF &
+           Symbolic_Traceback (Ada.Exceptions.Traceback.Tracebacks (E));
+      else
+         return GNAT.Traceback.Symbolic.Symbolic_Traceback (E);
+      end if;
    end Symbolic_Traceback;
 
 end Excep_Sym_Trace_Workaround;
