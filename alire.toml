@@ -1,6 +1,6 @@
 name = "exsytrawo"
 description = "Exception Symbolic Traceback Workaround for macOS"
-version = "1.2.0"
+version = "2.0.0"
 tags = ["exception", "symbolic", "traceback"]
 
 authors = ["Pascal Pignard"]
@@ -11,7 +11,3 @@ website = "https://github.com/Blady-Com/exsytrawo"
 licenses = "CECILL-C"
 
 project-files = ["exsytrawo.gpr"]
-
-[available.'case(os)']
-macos   = true
-'...'   = false

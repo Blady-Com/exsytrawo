@@ -7,6 +7,8 @@ because macOS doesn't support ***addr2line***.
 Hopefully, Xcode brings a similar tool: ***atos***.
 This library calls ***atos*** with exception information and returns
 the symbolic traceback.
+This workaround is compatible with other OS.
+Thus, in case of an other OS, it simply returns the original `Symbolic_Traceback` functions from GNAT.
 
 ## Usage
 
@@ -14,7 +16,7 @@ In your own [Alire](https://alire.ada.dev) project, add ***exsytrawo*** dependen
 
 `% alr with exsytrawo`
 
-Then you can import the Ada ***exsytrawo*** package in your programs.
+Then, you can import the Ada ***exsytrawo*** package in your programs.
 
 Your program must compile with ***-g*** switch and bind with ***-E*** switch.
 
@@ -73,4 +75,4 @@ end STBH;
 
 All files are provided under terms of the [CeCILL-C](https://cecill.info) licence.
 
-Pascal Pignard, February 2025.
+Pascal Pignard, February-August 2025.
